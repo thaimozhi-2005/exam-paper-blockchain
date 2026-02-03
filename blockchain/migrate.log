@@ -1,0 +1,48 @@
+
+Compiling your contracts...
+===========================
+> Compiling ./contracts/SecureExamPaper.sol
+> Artifacts written to /home/thaimozhi2005/exam paper blockchain/blockchain/build/contracts
+> Compiled successfully using:
+   - solc: 0.8.19+commit.7dd6d404.Emscripten.clang
+
+
+Starting migrations...
+======================
+> Network name:    'development'
+> Network id:      1337
+> Block gas limit: 30000000 (0x1c9c380)
+
+
+1_deploy_secure_exam.js
+=======================
+
+   Replacing 'SecureExamPaper'
+   ---------------------------
+   > transaction hash:    0xfc10280e4ddf2518f2014be87a42d80135e06c505c33f7b4952293c50404058d
+- Blocks: 0            Seconds: 0
+   > Blocks: 0            Seconds: 0
+   > contract address:    0xAFB01Ed5c843faBd9521f2f12166B6520Ab63f60
+   > block number:        1
+   > block timestamp:     1769691511
+   > account:             0x26351B8E2B6500a653086CFc33d75A5A9AC51a1F
+   > balance:             999.97854462
+   > gas used:            1072769 (0x105e81)
+   > gas price:           20 gwei
+   > value sent:          0 ETH
+   > total cost:          0.02145538 ETH
+
+✅ SecureExamPaper contract deployed successfully!
+📍 Contract Address: 0xAFB01Ed5c843faBd9521f2f12166B6520Ab63f60
+
+⚠️  IMPORTANT: Copy this address to backend/config/blockchain.json
+   > Saving artifacts
+   -------------------------------------
+   > Total cost:          0.02145538 ETH
+
+Summary
+=======
+> Total deployments:   1
+> Final cost:          0.02145538 ETH
+
+

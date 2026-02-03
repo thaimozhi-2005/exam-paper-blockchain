@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SET - Admin Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-bar">
+            <h1>👨‍💼 Admin Portal - SET</h1>
+            <div class="user-info">
+                <span id="userName">Admin</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="upload-section">
+                <h2>📄 Upload Exam Paper</h2>
+                <p class="subtitle">Encrypt and store exam paper on blockchain</p>
+
+                <form id="uploadForm" onsubmit="handleUpload(event)">
+                    <div class="form-group">
+                        <label for="pdf_file">📎 Select PDF File</label>
+                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
+                        <small>Only PDF files are allowed</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="college_id">🏫 College ID</label>
+                            <input type="text" id="college_id" name="college_id" required placeholder="e.g., COL001">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subject_code">📚 Subject Code</label>
+                            <input type="text" id="subject_code" name="subject_code" required placeholder="e.g., CS101">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="exam_datetime">📅 Exam Date & Time</label>
+                            <input type="datetime-local" id="exam_datetime" name="exam_datetime" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="principal_email">📧 Principal Email</label>
+                            <input type="email" id="principal_email" name="principal_email" required
+                                placeholder="principal@college.edu">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="submitBtn">
+                        🔐 Encrypt & Store on Blockchain
+                    </button>
+                </form>
+
+                <div id="progressSection" class="progress-section" style="display: none;">
+                    <h3>Processing...</h3>
+                    <div class="progress-steps">
+                        <div class="step" id="step1">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">Reading PDF</div>
+                        </div>
+                        <div class="step" id="step2">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">AES-256 Encryption</div>
+                        </div>
+                        <div class="step" id="step3">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">RSA-4096 Key Encryption</div>
+                        </div>
+                        <div class="step" id="step4">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">Blockchain Storage</div>
+                        </div>
+                        <div class="step" id="step5">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">Email Delivery</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultSection" class="result-section" style="display: none;">
+                    <div class="success-box">
+                        <h3>✅ Success!</h3>
+                        <div class="result-details">
+                            <div class="detail-row">
+                                <span class="label">Paper ID:</span>
+                                <span class="value" id="paperId"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Transaction Hash:</span>
+                                <span class="value hash" id="txHash"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Document Hash:</span>
+                                <span class="value hash" id="docHash"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">College ID:</span>
+                                <span class="value" id="resultCollegeId"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Subject Code:</span>
+                                <span class="value" id="resultSubjectCode"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Exam Date/Time:</span>
+                                <span class="value" id="resultExamDateTime"></span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="label">Email Status:</span>
+                                <span class="value" id="emailStatus"></span>
+                            </div>
+                        </div>
+                        <button onclick="resetForm()" class="btn-secondary">
+                            Upload Another Paper
+                        </button>
+                    </div>
+                </div>
+
+                <div id="errorSection" class="error-section" style="display: none;">
+                    <div class="error-box">
+                        <h3>❌ Error</h3>
+                        <p id="errorMessage"></p>
+                        <button onclick="resetForm()" class="btn-secondary">Try Again</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>ℹ️ How It Works</h3>
+                <ol>
+                    <li><strong>Upload PDF:</strong> Select the exam paper PDF file</li>
+                    <li><strong>Enter Details:</strong> Provide college ID, subject code, exam date/time, and principal
+                        email</li>
+                    <li><strong>AES-256 Encryption:</strong> PDF content is encrypted with military-grade AES-256</li>
+                    <li><strong>RSA-4096 Encryption:</strong> AES key is encrypted with RSA-4096 for the principal</li>
+                    <li><strong>Blockchain Storage:</strong> Encrypted data and metadata stored immutably on blockchain
+                    </li>
+                    <li><strong>Email Delivery:</strong> Encrypted package sent securely to principal</li>
+                    <li><strong>Time-Lock:</strong> Principal can only decrypt after exam date/time</li>
+                </ol>
+
+                <div class="security-badges">
+                    <div class="badge">🔐 AES-256</div>
+                    <div class="badge">🔑 RSA-4096</div>
+                    <div class="badge">⛓️ Blockchain</div>
+                    <div class="badge">⏰ Time-Lock</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/set.js"></script>
+</body>
+
+</html>

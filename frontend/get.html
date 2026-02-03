@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GET - Principal Portal</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="header-bar">
+            <h1>👨‍🎓 Principal Portal - GET</h1>
+            <div class="user-info">
+                <span id="userName">Principal</span>
+                <button onclick="logout()" class="btn-logout">Logout</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="verify-section">
+                <h2>🔍 Verify & Decrypt Exam Paper</h2>
+                <p class="subtitle">Upload encrypted package and verify authenticity</p>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('verify')">
+                        Step 1: Verify Paper
+                    </button>
+                    <button class="tab-btn" onclick="switchTab('decrypt')">
+                        Step 2: Decrypt Paper
+                    </button>
+                </div>
+
+                <!-- Step 1: Verify Paper -->
+                <div id="verifyTab" class="tab-content active">
+                    <form id="verifyForm" onsubmit="handleVerify(event)">
+                        <div class="form-group">
+                            <label for="paper_id_verify">📋 Paper ID</label>
+                            <input type="number" id="paper_id_verify" name="paper_id" required
+                                placeholder="Enter Paper ID from email">
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            🔍 Fetch Paper Details
+                        </button>
+                    </form>
+
+                    <div id="paperDetails" class="paper-details" style="display: none;">
+                        <h3>📄 Paper Information</h3>
+                        <div class="details-grid">
+                            <div class="detail-item">
+                                <span class="label">Paper ID:</span>
+                                <span class="value" id="detailPaperId"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">College ID:</span>
+                                <span class="value" id="detailCollegeId"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Subject Code:</span>
+                                <span class="value" id="detailSubjectCode"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Exam Date/Time:</span>
+                                <span class="value" id="detailExamDateTime"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Document Hash:</span>
+                                <span class="value hash" id="detailDocHash"></span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="label">Verified:</span>
+                                <span class="value" id="detailVerified"></span>
+                            </div>
+                        </div>
+
+                        <div id="timeLockStatus" class="time-lock-status">
+                            <!-- Will be populated dynamically -->
+                        </div>
+
+                        <button onclick="switchTab('decrypt')" class="btn-primary">
+                            Proceed to Decryption →
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Decrypt Paper -->
+                <div id="decryptTab" class="tab-content">
+                    <form id="decryptForm" onsubmit="handleDecrypt(event)">
+                        <div class="form-group">
+                            <label for="paper_id_decrypt">📋 Paper ID</label>
+                            <input type="number" id="paper_id_decrypt" name="paper_id" required
+                                placeholder="Enter Paper ID">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="package_file">📦 Encrypted Package File</label>
+                            <input type="file" id="package_file" name="package_file" accept=".json" required>
+                            <small>Upload the encrypted_paper_*.json file from email</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="college_id_decrypt">🏫 College ID</label>
+                            <input type="text" id="college_id_decrypt" name="college_id" required
+                                placeholder="Your College ID">
+                        </div>
+
+                        <button type="submit" class="btn-primary" id="decryptBtn">
+                            🔓 Decrypt & Download PDF
+                        </button>
+                    </form>
+
+                    <div id="decryptProgress" class="progress-section" style="display: none;">
+                        <h3>Decrypting...</h3>
+                        <div class="progress-steps">
+                            <div class="step" id="decrypt-step1">
+                                <div class="step-icon">⏳</div>
+                                <div class="step-text">Time-Lock Verification</div>
+                            </div>
+                            <div class="step" id="decrypt-step2">
+                                <div class="step-icon">⏳</div>
+                                <div class="step-text">Fetching Blockchain Data</div>
+                            </div>
+                            <div class="step" id="decrypt-step3">
+                                <div class="step-icon">⏳</div>
+                                <div class="step-text">RSA Decryption</div>
+                            </div>
+                            <div class="step" id="decrypt-step4">
+                                <div class="step-icon">⏳</div>
+                                <div class="step-text">AES Decryption</div>
+                            </div>
+                            <div class="step" id="decrypt-step5">
+                                <div class="step-icon">⏳</div>
+                                <div class="step-text">Hash Verification</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="decryptSuccess" class="success-section" style="display: none;">
+                        <div class="success-box">
+                            <div class="green-tick">✓</div>
+                            <h3>Paper Verified & Decrypted Successfully!</h3>
+                            <p>The exam paper has been authenticated and is ready for download.</p>
+
+                            <div class="verification-badges">
+                                <div class="badge success">✓ Time-Lock Passed</div>
+                                <div class="badge success">✓ Blockchain Verified</div>
+                                <div class="badge success">✓ Hash Matched</div>
+                                <div class="badge success">✓ Decryption Complete</div>
+                            </div>
+
+                            <p class="download-info">
+                                Your decrypted PDF has been downloaded automatically.
+                            </p>
+
+                            <button onclick="resetDecrypt()" class="btn-secondary">
+                                Verify Another Paper
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="decryptError" class="error-section" style="display: none;">
+                        <div class="error-box">
+                            <h3>❌ Decryption Failed</h3>
+                            <p id="decryptErrorMessage"></p>
+                            <button onclick="resetDecrypt()" class="btn-secondary">Try Again</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3>ℹ️ Verification Process</h3>
+                <ol>
+                    <li><strong>Step 1:</strong> Enter Paper ID from email to fetch details from blockchain</li>
+                    <li><strong>Time-Lock Check:</strong> System verifies exam date/time has been reached</li>
+                    <li><strong>Step 2:</strong> Upload encrypted package file (.json)</li>
+                    <li><strong>RSA Decryption:</strong> Your private key decrypts the AES key</li>
+                    <li><strong>AES Decryption:</strong> AES key decrypts the PDF content</li>
+                    <li><strong>Hash Verification:</strong> Document hash is verified against blockchain</li>
+                    <li><strong>Green Tick:</strong> Visual confirmation of successful verification</li>
+                    <li><strong>Download:</strong> Authenticated PDF is ready for use</li>
+                </ol>
+
+                <div class="security-info">
+                    <h4>🔒 Security Features</h4>
+                    <ul>
+                        <li>⏰ Time-lock prevents early access</li>
+                        <li>⛓️ Blockchain ensures immutability</li>
+                        <li>🔐 Military-grade encryption (AES-256 + RSA-4096)</li>
+                        <li>✓ Hash verification detects tampering</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/get.js"></script>
+</body>
+
+</html>

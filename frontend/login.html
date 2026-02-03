@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Blockchain Exam Verification</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="login-box">
+            <div class="header">
+                <h1>🎓 Blockchain Exam Verification</h1>
+                <p>Secure Exam Paper Distribution System</p>
+            </div>
+
+            <div class="login-form">
+                <h2>Login</h2>
+
+                <div class="role-selector">
+                    <button class="role-btn active" onclick="selectRole('admin')">
+                        👨‍💼 Admin
+                    </button>
+                    <button class="role-btn" onclick="selectRole('principal')">
+                        👨‍🎓 Principal
+                    </button>
+                </div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="register_no">Register Number</label>
+                        <input type="text" id="register_no" name="register_no" required
+                            placeholder="Enter your register number">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Enter your password">
+                    </div>
+
+                    <input type="hidden" id="role" name="role" value="admin">
+
+                    <button type="submit" class="btn-primary">
+                        🔐 Login
+                    </button>
+                </form>
+
+                <div id="message" class="message"></div>
+
+                <div class="demo-credentials">
+                    <h3>Demo Credentials</h3>
+                    <div class="credentials-grid">
+                        <div>
+                            <strong>Admin:</strong><br>
+                            Register No: ADMIN001<br>
+                            Password: admin123
+                        </div>
+                        <div>
+                            <strong>Principal:</strong><br>
+                            Register No: PRIN001<br>
+                            Password: principal123
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+
+</html>

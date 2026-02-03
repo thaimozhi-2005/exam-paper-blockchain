@@ -1,0 +1,137 @@
+ganache v7.9.2 (@ganache/cli: 0.10.2, @ganache/core: 0.10.2)
+Starting RPC server
+
+Available Accounts
+==================
+(0) 0x26351B8E2B6500a653086CFc33d75A5A9AC51a1F (1000 ETH)
+(1) 0x04D6Ce8a3caa22D6083235EA38b18CC6DC773259 (1000 ETH)
+(2) 0xc5E387748194eF1E34070772865EC9fd4cd13e6a (1000 ETH)
+(3) 0x940d68700dA98b557D311945DF92A5E9C4c2ddDA (1000 ETH)
+(4) 0xbAB9a5727BF337c83F1EdcAd50f3fb54975D4EA1 (1000 ETH)
+(5) 0xe5586e4C74BD98F24b06035DD0CCEc9Cea9e1Df3 (1000 ETH)
+(6) 0x4EabE758e7fc5Ff41298C91874200731F62F27e7 (1000 ETH)
+(7) 0x413487E71Fd0105f36460AE9B7c7a972B4527368 (1000 ETH)
+(8) 0xD37A6ecb1b1EADE6Cb94728D0084aEF8575453c1 (1000 ETH)
+(9) 0x7A3747118010580BA2A7Ec6f8af8EbBc0B376C62 (1000 ETH)
+
+Private Keys
+==================
+(0) 0x2d6c9f17239d7fda3945027179c0ff3f3b50b503e043f931c6c99bc10963b5d1
+(1) 0x0adbc9929e382355c45cff78bbd30489f1ffa8f385e900b656d08be63ef06188
+(2) 0xce58210a889e51087c60ca75718c24ee1b2c2af12c9ca837a0ed7a6cb322ff8f
+(3) 0x03f4765d59ea370685ca8c0ad43d8daaae470555e940d340e2c068b00662ce61
+(4) 0x4e6a75c097aa63b710e3893dc68dceee0b6ad1855f0200a1d24bd7f5533b9442
+(5) 0xa157fc4e2c6a7d0d2e3a27bcaabcd586c2531ceab728afd2f39386c619680424
+(6) 0xe6ef7dbdd24e2ebabfca94862c2f1fe543f5c83aa530df5a493c4e3fe98bf05a
+(7) 0x2f511f798c670c61ffa362df51a24963f0382432c943bce71ae46be915900413
+(8) 0x3d2d346620cf367165a5d0cc54ec31c0a3a8c727cf4184eea7baa924c0cd9173
+(9) 0x2baf6f1efc84d2b93e949fd6343e27f27822df0b9e3ee35ec9545f1cfd598d0d
+
+HD Wallet
+==================
+Mnemonic:      honest amazing essence logic match provide actual method setup target allow mammal
+Base HD Path:  m/44'/60'/0'/0/{account_index}
+
+Default Gas Price
+==================
+2000000000
+
+BlockGas Limit
+==================
+30000000
+
+Call Gas Limit
+==================
+50000000
+
+Chain
+==================
+Hardfork: shanghai
+Id:       1337
+
+RPC Listening on 127.0.0.1:8545
+eth_blockNumber
+net_version
+eth_accounts
+eth_getBlockByNumber
+eth_accounts
+eth_getBlockByNumber
+eth_getBlockByNumber
+eth_getBlockByNumber
+eth_estimateGas
+eth_getBlockByNumber
+eth_blockNumber
+eth_sendTransaction
+
+  Transaction: 0xfc10280e4ddf2518f2014be87a42d80135e06c505c33f7b4952293c50404058d
+  Contract created: 0xafb01ed5c843fabd9521f2f12166b6520ab63f60
+  Gas usage: 1072769
+  Block number: 1
+  Block time: Thu Jan 29 2026 18:28:31 GMT+0530 (India Standard Time)
+
+eth_getTransactionReceipt
+eth_getCode
+eth_getTransactionByHash
+eth_getBlockByNumber
+eth_getBalance
+web3_clientVersion
+eth_chainId
+web3_clientVersion
+eth_chainId
+eth_chainId
+eth_call
+eth_getBlockByNumber
+eth_getTransactionCount
+eth_gasPrice
+eth_chainId
+eth_sendRawTransaction
+
+  Transaction: 0x2da33f1c4636bf467a3f100c712ae68d8b9f60b2dbf909ad272f448aaa233bd2
+  Gas usage: 800566
+  Block number: 2
+  Block time: Thu Jan 29 2026 18:29:55 GMT+0530 (India Standard Time)
+
+eth_getTransactionReceipt
+eth_chainId
+eth_call
+evm_setNextBlockTimestamp
+evm_mine
+eth_chainId
+eth_call
+eth_chainId
+eth_call
+evm_setNextBlockTimestamp
+evm_mine
+eth_chainId
+eth_call
+evm_setNextBlockTimestamp
+evm_mine
+eth_chainId
+eth_call
+eth_chainId
+eth_call
+evm_setNextBlockTimestamp
+evm_mine
+eth_chainId
+eth_call
+evm_setNextBlockTimestamp
+evm_mine
+eth_chainId
+eth_call
+eth_chainId
+eth_call
+evm_setNextBlockTimestamp
+evm_mine
+eth_chainId
+eth_call
+eth_getTransactionCount
+eth_gasPrice
+eth_chainId
+eth_sendRawTransaction
+
+  Transaction: 0x2444a633fce53e92a50a363d4401b63dc145fa68b32b04dc0947493049c2b472
+  Gas usage: 30752
+  Block number: 9
+  Block time: Thu Jan 29 2026 18:32:16 GMT+0530 (India Standard Time)
+
+eth_getTransactionReceipt
