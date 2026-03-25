@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Exam Verification System
+Comment=Blockchain-based Exam Paper Verification
+Exec=/bin/bash "/home/thaimozhi2005/exam paper blockchain/launch_app.sh"
+Path=/home/thaimozhi2005/exam paper blockchain
+Icon=/home/thaimozhi2005/app_icon_exam.png
+Terminal=false
+Categories=Education;Security;
+StartupWMClass=exam-verification

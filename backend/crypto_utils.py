@@ -130,7 +130,7 @@ class CryptoUtils:
     @staticmethod
     def decrypt_package(encrypted_pdf_b64, encrypted_aes_key_b64, iv_b64, private_key):
         """
-        Complete decryption workflow:
+        Complete decryption workflow for legacy JSON packages:
         1. Decrypt AES key with RSA-4096
         2. Decrypt PDF with AES-256
         Returns: decrypted_pdf_data
@@ -143,6 +143,63 @@ class CryptoUtils:
         aes_key = CryptoUtils.decrypt_aes_key_rsa(encrypted_aes_key_b64, private_key)
         
         # Decrypt PDF with AES
+        decrypted_pdf = CryptoUtils.decrypt_pdf_aes(encrypted_pdf, aes_key, iv)
+        
+        return decrypted_pdf
+
+    @staticmethod
+    def create_encrypted_file_package(pdf_data, public_key):
+        """
+        New Binary Overhaul:
+        1. Encrypt PDF with AES-256
+        2. Encrypt AES key with RSA-4096
+        3. Pack into binary format: [IV(16 bytes)] + [RSA_KEY_LEN(2 bytes)] + [RSA_KEY] + [ENC_PDF]
+        
+        Returns: binary_blob, encrypted_aes_key_b64 (for blockchain)
+        """
+        # 1. AES Encrypt
+        encrypted_pdf, aes_key, iv = CryptoUtils.encrypt_pdf_aes(pdf_data)
+        
+        # 2. RSA Encrypt AES Key
+        cipher_rsa = PKCS1_OAEP.new(public_key)
+        encrypted_rsa_key = cipher_rsa.encrypt(aes_key)
+        
+        # 3. Construct Binary Blob
+        # RSA key length (usually 512 bytes for 4096-bit RSA)
+        rsa_len = len(encrypted_rsa_key).to_bytes(2, byteorder='big')
+        
+        binary_blob = iv + rsa_len + encrypted_rsa_key + encrypted_pdf
+        
+        # Also return base64 RSA key for blockchain storage (as per existing smart contract)
+        encrypted_aes_key_b64 = base64.b64encode(encrypted_rsa_key).decode('utf-8')
+        
+        return binary_blob, encrypted_aes_key_b64
+
+    @staticmethod
+    def parse_encrypted_file_package(binary_blob, private_key):
+        """
+        Extract and decrypt components from binary blob:
+        Format: [IV(16)] + [RSA_LEN(2)] + [RSA_KEY] + [ENC_PDF]
+        
+        Returns: decrypted_pdf
+        """
+        # 1. Extract IV
+        iv = binary_blob[:16]
+        
+        # 2. Extract RSA Key Length
+        rsa_len = int.from_bytes(binary_blob[16:18], byteorder='big')
+        
+        # 3. Extract RSA Key
+        encrypted_rsa_key = binary_blob[18:18+rsa_len]
+        
+        # 4. Extract Encrypted PDF
+        encrypted_pdf = binary_blob[18+rsa_len:]
+        
+        # 5. Decrypt RSA Key
+        cipher_rsa = PKCS1_OAEP.new(private_key)
+        aes_key = cipher_rsa.decrypt(encrypted_rsa_key)
+        
+        # 6. Decrypt PDF
         decrypted_pdf = CryptoUtils.decrypt_pdf_aes(encrypted_pdf, aes_key, iv)
         
         return decrypted_pdf

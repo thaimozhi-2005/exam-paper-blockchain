@@ -5,160 +5,1413 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SET - Admin Portal</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="lib/pdf-lib.min.js"></script>
+    <script src="lib/pdf.min.js?v=5"></script>
+    <script src="lib/fabric.min.js"></script>
+    <script src="lib/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a6fff;
+            --primary-dark: #1255d4;
+            --primary-light: #e8f0fe;
+            --accent: #0cc6e8;
+            --bg: #f0f6ff;
+            --surface: #ffffff;
+            --surface2: #f7faff;
+            --border: #d0e0fa;
+            --text-head: #0d1f4c;
+            --text-body: #2e4070;
+            --text-muted: #7a90bb;
+            --text-input: #0d1f4c;
+            --shadow-card: 0 8px 48px rgba(26, 111, 255, 0.10), 0 2px 12px rgba(26, 111, 255, 0.06);
+            --shadow-btn: 0 6px 24px rgba(26, 111, 255, 0.30);
+            --radius-card: 22px;
+            --radius-input: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: var(--bg);
+            padding: 40px 20px;
+            color: var(--text-body);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ── Background mesh ── */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(26, 111, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 111, 255, 0.03) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 18s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 340px;
+            height: 340px;
+            top: -80px;
+            left: -80px;
+            background: rgba(26, 111, 255, 0.08);
+        }
+
+        .orb-2 {
+            width: 280px;
+            height: 280px;
+            bottom: -60px;
+            right: -60px;
+            background: rgba(12, 198, 232, 0.07);
+            animation-delay: -6s;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(30px, 40px) scale(1.08);
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ── Header Bar ── */
+        .header-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px 32px;
+            border-radius: var(--radius-card);
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-card);
+        }
+
+        .header-bar h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-head);
+            letter-spacing: -0.5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info span {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            padding: 10px 24px;
+            background: #fff;
+            color: #ff4757;
+            border: 1.5px solid #ff4757;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #ff4757;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+        }
+
+        /* ── Glass Card ── */
+        .glass-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 48px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 32px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-card h2 {
+            font-family: 'Sora', sans-serif;
+            color: var(--text-head);
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .glass-card .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 32px;
+        }
+
+        /* ── Form Styles ── */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-body);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-input);
+            color: var(--text-head);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group input:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(26, 111, 255, 0.08);
+        }
+
+        .form-group input[type="file"] {
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: 0.3s;
+        }
+
+        .form-group input[type="file"]::file-selector-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .form-group small {
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 6px;
+            display: block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), #1a8fff);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            box-shadow: var(--shadow-btn);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(26, 111, 255, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: var(--surface2);
+            color: var(--primary);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+        }
+
+        /* ── Papers Toggle Button ── */
+        .papers-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 28px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: 1.5px solid var(--border);
+            border-radius: 14px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+            margin-bottom: 24px;
+        }
+
+        .papers-toggle:hover {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(26, 111, 255, 0.1);
+        }
+
+        .total-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* ── Paper Table ── */
+        .paper-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .paper-table thead th {
+            background: var(--surface2);
+            color: var(--text-body);
+            padding: 16px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .paper-table tbody tr {
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .paper-table tbody tr:hover {
+            background: var(--surface2);
+        }
+
+        .paper-table tbody td {
+            padding: 16px;
+            color: var(--text-head);
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .status-badge.stored {
+            background: #eafaf1;
+            color: #1a7a40;
+        }
+
+        .status-badge.verified {
+            background: #e8f4fd;
+            color: #2980b9;
+        }
+
+        .refresh-btn {
+            padding: 10px 20px;
+            background: var(--surface2);
+            color: var(--primary);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            transition: all 0.3s;
+            float: right;
+            margin-top: -48px;
+        }
+
+        .refresh-btn:hover {
+            background: var(--primary-light);
+        }
+
+        /* ── Result Section ── */
+        .success-box {
+            background: #eafaf1;
+            border: 1.5px solid #b7e7cb;
+            border-radius: 18px;
+            padding: 32px;
+        }
+
+        .success-box h3 {
+            color: #1a7a40;
+            margin-bottom: 20px;
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-row .label {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 13.5px;
+        }
+
+        .detail-row .value {
+            color: var(--text-head);
+            font-weight: 700;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .detail-row .value.hash {
+            font-family: monospace;
+            color: var(--primary);
+            font-size: 12px;
+        }
+
+        .error-box {
+            background: #fff1f2;
+            border: 1.5px solid #f5c6cb;
+            border-radius: 18px;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .error-box h3 {
+            color: #c0392b;
+            margin-bottom: 12px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        /* ── Info Card ── */
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 40px;
+            margin-top: 32px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .info-card h3 {
+            color: var(--text-head);
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .info-card li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            font-size: 14.5px;
+            color: var(--text-body);
+        }
+
+        .security-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            background: var(--primary-light);
+            border: 1px solid rgba(26, 111, 255, 0.18);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        /* ── Message Toast ── */
+        .message-toast {
+            margin-top: 20px;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            text-align: center;
+        }
+
+        .message-toast.success {
+            background: #eafaf1;
+            color: #1a7a40;
+            border: 1px solid #b7e7cb;
+            display: block;
+        }
+
+        .message-toast.error {
+            background: #fff1f2;
+            color: #c0392b;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        /* ── PDF Edit Modal ── */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 31, 76, 0.85);
+            backdrop-filter: blur(8px);
+        }
+
+        .office-editor-content {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            margin: 0;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            background: #eef1f5;
+            overflow: hidden;
+        }
+
+        /* Ribbon Styles */
+        .office-ribbon {
+            background: #f3f3f3;
+            border-bottom: 1px solid #d1d1d1;
+            user-select: none;
+        }
+
+        .ribbon-tabs {
+            display: flex;
+            background: #2b579a;
+            /* Word Blue */
+            padding-left: 10px;
+        }
+
+        .ribbon-tab {
+            padding: 8px 20px;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            border-top: 3px solid transparent;
+        }
+
+        .ribbon-tab.active {
+            background: #f3f3f3;
+            color: #2b579a;
+            font-weight: 600;
+            border-top: 3px solid #2b579a;
+        }
+
+        .ribbon-toolbar {
+            display: flex;
+            padding: 5px 15px;
+            background: #f3f3f3;
+            gap: 10px;
+            align-items: center;
+            height: 90px;
+        }
+
+        .toolbar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5px;
+            height: 100%;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex: 1;
+        }
+
+        .toolbar-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .toolbar-divider {
+            width: 1px;
+            height: 70%;
+            background: #d1d1d1;
+            margin: 0 5px;
+        }
+
+        .ribbon-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            min-width: 60px;
+            transition: all 0.2s;
+        }
+
+        .ribbon-btn:hover {
+            background: #ddeaf6;
+            border-color: #b8d2eb;
+        }
+
+        .ribbon-btn .btn-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+
+        .ribbon-btn .btn-text {
+            font-size: 11px;
+            color: #333;
+        }
+
+        .ribbon-btn.action-btn {
+            background: #2b579a;
+            color: white;
+        }
+
+        .ribbon-btn.action-btn .btn-text {
+            color: white;
+        }
+
+        #add_text_input {
+            width: 150px;
+            height: 60px;
+            font-size: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+            resize: none;
+        }
+
+        .toolbar-hint {
+            font-size: 11px;
+            color: #2b579a;
+            font-style: italic;
+            max-width: 120px;
+        }
+
+        /* Workspace - scrollable multi-page container */
+        .office-editor-workspace {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 40px 60px 40px;
+            background: #d4d7db;
+            position: relative;
+        }
+
+        /* Individual page containers are created dynamically by JS */
+        .pdf-page-container {
+            margin-bottom: 30px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+
+        .canvas-viewport {
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        /* Status Bar */
+        .office-status-bar {
+            background: #2b579a;
+            color: white;
+            padding: 4px 20px;
+            font-size: 12px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Loading Overlay */
+        .editor-loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            /* Shown via JS */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2b579a;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .pdf-editor-content {
+            width: 95%;
+            max-width: 1400px;
+            height: 90vh;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            background: white;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .keyboard-hint {
+            font-size: 13px;
+            color: #7f8c8d;
+            background: #f8f9fa;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .editor-container {
+            display: flex;
+            flex: 1;
+            background: #f0f2f5;
+            overflow: hidden;
+        }
+
+        .pdf-workspace {
+            flex: 3;
+            padding: 30px;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .editor-sidebar {
+            flex: 1;
+            max-width: 320px;
+            background: white;
+            border-left: 1px solid #eee;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .tool-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+
+        .tool-group textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            margin-bottom: 10px;
+            resize: none;
+        }
+
+        .btn-tool {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            background: #4834d4;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-tool.secondary {
+            background: #f0f2f5;
+            color: #2c3e50;
+            border: 1px solid #ddd;
+        }
+
+        .tool-separator {
+            height: 1px;
+            background: #eee;
+        }
+
+        .tool-hint {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 5px;
+        }
+
+        .canvas-container {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            background: white;
+        }
+
+        @keyframes modalSlide {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            padding: 24px 32px;
+            background: var(--surface2);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 24px;
+            display: flex;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        .pdf-preview-container {
+            flex: 1;
+            background: #eee;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            background-image: radial-gradient(#d1d1d1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        #pdfCanvas {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            margin: 20px;
+            background: white;
+            max-width: 100%;
+        }
+
+        .edit-tools {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tool-box {
+            background: var(--surface2);
+            padding: 20px;
+            border-radius: 16px;
+            border: 1.5px solid var(--border);
+        }
+
+        .tool-box h4 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            color: var(--text-head);
+        }
+
+        .modal-footer {
+            padding: 20px 32px;
+            background: var(--surface2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+        }
+
+        .close-modal {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close-modal:hover {
+            color: #ff4757;
+        }
+
+        .image-preview-thumb {
+            width: 100%;
+            height: 100px;
+            object-fit: contain;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        @media (max-width: 700px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-bar {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .glass-card {
+                padding: 32px 24px;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="grid-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
     <div class="container">
+        <!-- Header -->
         <div class="header-bar">
-            <h1>👨‍💼 Admin Portal - SET</h1>
+            <h1>👨‍💼 Admin Portal — SET</h1>
             <div class="user-info">
                 <span id="userName">Admin</span>
                 <button onclick="logout()" class="btn-logout">Logout</button>
             </div>
         </div>
 
-        <div class="main-content">
-            <div class="upload-section">
-                <h2>📄 Upload Exam Paper</h2>
-                <p class="subtitle">Encrypt and store exam paper on blockchain</p>
+        <!-- Upload Section -->
+        <div class="glass-card">
+            <h2>📄 Upload Exam Paper</h2>
+            <p class="subtitle">Encrypt and store exam paper securely on the Ethereum Blockchain</p>
 
-                <form id="uploadForm" onsubmit="handleUpload(event)">
-                    <div class="form-group">
-                        <label for="pdf_file">📎 Select PDF File</label>
-                        <input type="file" id="pdf_file" name="pdf_file" accept=".pdf" required>
-                        <small>Only PDF files are allowed</small>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="college_id">🏫 College ID</label>
-                            <input type="text" id="college_id" name="college_id" required placeholder="e.g., COL001">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="subject_code">📚 Subject Code</label>
-                            <input type="text" id="subject_code" name="subject_code" required placeholder="e.g., CS101">
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="exam_datetime">📅 Exam Date & Time</label>
-                            <input type="datetime-local" id="exam_datetime" name="exam_datetime" required>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="principal_email">📧 Principal Email</label>
-                            <input type="email" id="principal_email" name="principal_email" required
-                                placeholder="principal@college.edu">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="btn-primary" id="submitBtn">
-                        🔐 Encrypt & Store on Blockchain
+            <form id="uploadForm" onsubmit="handleUpload(event)">
+                <div class="upload-options">
+                    <button type="button" class="upload-opt active" onclick="setUploadMode('file', this)">
+                        📎 Upload File (.txt, .pdf)
                     </button>
-                </form>
+                    <button type="button" class="upload-opt" onclick="setUploadMode('scratch', this)">
+                        ✍️ Create Question Paper Now
+                    </button>
+                    <input type="hidden" name="uploadOption" id="uploadOptionInput" value="file">
+                </div>
 
-                <div id="progressSection" class="progress-section" style="display: none;">
-                    <h3>Processing...</h3>
-                    <div class="progress-steps">
-                        <div class="step" id="step1">
-                            <div class="step-icon">⏳</div>
-                            <div class="step-text">Reading PDF</div>
-                        </div>
-                        <div class="step" id="step2">
-                            <div class="step-icon">⏳</div>
-                            <div class="step-text">AES-256 Encryption</div>
-                        </div>
-                        <div class="step" id="step3">
-                            <div class="step-icon">⏳</div>
-                            <div class="step-text">RSA-4096 Key Encryption</div>
-                        </div>
-                        <div class="step" id="step4">
-                            <div class="step-icon">⏳</div>
-                            <div class="step-text">Blockchain Storage</div>
-                        </div>
-                        <div class="step" id="step5">
-                            <div class="step-icon">⏳</div>
-                            <div class="step-text">Email Delivery</div>
-                        </div>
+                <div class="form-group" id="fileUploadGroup">
+                    <label for="pdf_file" id="fileLabel">📎 Select File</label>
+                    <input type="file" id="pdf_file" name="pdf_file" accept=".pdf,.txt">
+                    <small>Only PDF and TXT files are allowed</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="college_id">🏫 College ID</label>
+                        <input type="text" id="college_id" name="college_id" required placeholder="e.g., COL001">
+                    </div>
+                    <div class="form-group">
+                        <label for="subject_code">📚 Subject Code</label>
+                        <input type="text" id="subject_code" name="subject_code" required placeholder="e.g., CS101">
                     </div>
                 </div>
 
-                <div id="resultSection" class="result-section" style="display: none;">
-                    <div class="success-box">
-                        <h3>✅ Success!</h3>
-                        <div class="result-details">
-                            <div class="detail-row">
-                                <span class="label">Paper ID:</span>
-                                <span class="value" id="paperId"></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Transaction Hash:</span>
-                                <span class="value hash" id="txHash"></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Document Hash:</span>
-                                <span class="value hash" id="docHash"></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">College ID:</span>
-                                <span class="value" id="resultCollegeId"></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Subject Code:</span>
-                                <span class="value" id="resultSubjectCode"></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Exam Date/Time:</span>
-                                <span class="value" id="resultExamDateTime"></span>
-                            </div>
-                            <div class="detail-row">
-                                <span class="label">Email Status:</span>
-                                <span class="value" id="emailStatus"></span>
-                            </div>
-                        </div>
-                        <button onclick="resetForm()" class="btn-secondary">
-                            Upload Another Paper
-                        </button>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="exam_datetime">📅 Exam Date & Time</label>
+                        <input type="datetime-local" id="exam_datetime" name="exam_datetime" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="principal_email">📧 Principal Email</label>
+                        <input type="email" id="principal_email" name="principal_email" required
+                            placeholder="principal@college.edu">
                     </div>
                 </div>
 
-                <div id="errorSection" class="error-section" style="display: none;">
-                    <div class="error-box">
-                        <h3>❌ Error</h3>
-                        <p id="errorMessage"></p>
-                        <button onclick="resetForm()" class="btn-secondary">Try Again</button>
+                <button type="submit" class="btn-primary" id="submitBtn">
+                    🔐 Encrypt & Store on Blockchain
+                </button>
+                <button type="button" class="btn-secondary" id="previewBtn" style="margin-top: 12px; width: 100%;"
+                    onclick="openPdfEditor()">
+                    👁️ Preview & Edit PDF
+                </button>
+            </form>
+
+            <!-- Progress -->
+            <div id="progressSection" class="progress-section" style="display: none;">
+                <h3 style="margin-bottom: 16px; font-size: 16px; color: var(--text-body);">Processing...</h3>
+                <div class="progress-steps" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="step" id="step1"
+                        style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface2); border-radius: 10px; border: 1.5px solid var(--border);">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-text" style="font-weight: 600;">Reading PDF</div>
+                    </div>
+                    <div class="step" id="step2"
+                        style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface2); border-radius: 10px; border: 1.5px solid var(--border);">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-text" style="font-weight: 600;">AES-256 Encryption</div>
+                    </div>
+                    <div class="step" id="step3"
+                        style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface2); border-radius: 10px; border: 1.5px solid var(--border);">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-text" style="font-weight: 600;">RSA-4096 Key Encryption</div>
+                    </div>
+                    <div class="step" id="step4"
+                        style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface2); border-radius: 10px; border: 1.5px solid var(--border);">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-text" style="font-weight: 600;">Blockchain Storage</div>
+                    </div>
+                    <div class="step" id="step5"
+                        style="display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: var(--surface2); border-radius: 10px; border: 1.5px solid var(--border);">
+                        <div class="step-icon">⏳</div>
+                        <div class="step-text" style="font-weight: 600;">Email Delivery</div>
                     </div>
                 </div>
             </div>
 
-            <div class="info-section">
-                <h3>ℹ️ How It Works</h3>
-                <ol>
-                    <li><strong>Upload PDF:</strong> Select the exam paper PDF file</li>
-                    <li><strong>Enter Details:</strong> Provide college ID, subject code, exam date/time, and principal
-                        email</li>
-                    <li><strong>AES-256 Encryption:</strong> PDF content is encrypted with military-grade AES-256</li>
-                    <li><strong>RSA-4096 Encryption:</strong> AES key is encrypted with RSA-4096 for the principal</li>
-                    <li><strong>Blockchain Storage:</strong> Encrypted data and metadata stored immutably on blockchain
-                    </li>
-                    <li><strong>Email Delivery:</strong> Encrypted package sent securely to principal</li>
-                    <li><strong>Time-Lock:</strong> Principal can only decrypt after exam date/time</li>
-                </ol>
-
-                <div class="security-badges">
-                    <div class="badge">🔐 AES-256</div>
-                    <div class="badge">🔑 RSA-4096</div>
-                    <div class="badge">⛓️ Blockchain</div>
-                    <div class="badge">⏰ Time-Lock</div>
+            <!-- Result -->
+            <div id="resultSection" class="result-section" style="display: none;">
+                <div class="success-box">
+                    <h3>✅ Paper Stored Successfully!</h3>
+                    <div class="result-details">
+                        <div class="detail-row"><span class="label">Paper ID</span><span class="value"
+                                id="paperId"></span></div>
+                        <div class="detail-row"><span class="label">Transaction Hash</span><span class="value hash"
+                                id="txHash"></span></div>
+                        <div class="detail-row"><span class="label">Document Hash</span><span class="value hash"
+                                id="docHash"></span></div>
+                        <div class="detail-row"><span class="label">College ID</span><span class="value"
+                                id="resultCollegeId"></span></div>
+                        <div class="detail-row"><span class="label">Subject Code</span><span class="value"
+                                id="resultSubjectCode"></span></div>
+                        <div class="detail-row"><span class="label">Exam Date/Time</span><span class="value"
+                                id="resultExamDateTime"></span></div>
+                        <div class="detail-row"><span class="label">Email Status</span><span class="value"
+                                id="emailStatus"></span></div>
+                    </div>
+                    <button onclick="resetForm()" class="btn-secondary" style="margin-top: 20px; width: 100%;">Upload
+                        Another Paper</button>
                 </div>
+            </div>
+
+            <!-- Error -->
+            <div id="errorSection" class="error-section" style="display: none;">
+                <div class="error-box">
+                    <h3>❌ Upload Failed</h3>
+                    <p id="errorMessage" style="margin-bottom: 20px;"></p>
+                    <button onclick="resetForm()" class="btn-secondary" style="width: 100%;">Try Again</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Manage Principals Section -->
+        <div class="glass-card">
+            <h2 style="display: flex; justify-content: space-between; align-items: center;">
+                👥 Manage Principals
+                <button class="papers-toggle" id="principalsToggleBtn" onclick="togglePrincipals()"
+                    style="margin-bottom: 0; padding: 10px 20px;">
+                    Open Manager <span class="chevron"
+                        style="font-size: 10px; transition: transform 0.3s; margin-left: 8px;">▼</span>
+                </button>
+            </h2>
+            <p class="subtitle" id="principalsSubtitle">Register new Principal accounts for colleges</p>
+
+            <div id="principalsWrap" style="max-height: 0; overflow: hidden; transition: all 0.5s ease; opacity: 0;">
+                <form id="registerForm" onsubmit="handleRegister(event)"
+                    style="padding-top: 20px; border-top: 1px dashed var(--border);">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg_no">🆔 Register Number</label>
+                            <input type="text" id="reg_no" name="reg_no" required placeholder="e.g., PRIN002">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg_name">👤 Principal Name</label>
+                            <input type="text" id="reg_name" name="reg_name" required
+                                placeholder="e.g., Dr. Rajesh Kumar">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reg_email">📧 Principal Email</label>
+                            <input type="email" id="reg_email" name="reg_email" required
+                                placeholder="principal2@college.edu">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg_college">🏫 College ID</label>
+                            <input type="text" id="reg_college" name="reg_college" required placeholder="e.g., COL002">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg_password">🔒 Initial Password</label>
+                        <input type="password" id="reg_password" name="reg_password" required
+                            placeholder="Enter initial password">
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="registerBtn">
+                        ➕ Add Principal Account
+                    </button>
+                </form>
+                <div id="registerMessage" class="message-toast"></div>
+            </div>
+        </div>
+
+        <!-- Papers History Section -->
+        <div class="glass-card">
+            <h2>📋 View Uploaded Papers</h2>
+            <button class="papers-toggle" id="papersToggleBtn" onclick="togglePaperList()">
+                Show Paper List <span class="total-badge" id="totalPapers">0</span> <span class="chevron"
+                    style="font-size: 10px; transition: transform 0.3s;">▼</span>
+            </button>
+            <button class="refresh-btn" onclick="loadPaperList()" style="display:none;" id="refreshBtn">🔄
+                Refresh</button>
+
+            <div class="paper-list-wrap" id="paperListWrap"
+                style="max-height: 0; overflow: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); opacity: 0; border-top: 1px dashed var(--border);">
+                <div id="paperListContent" style="padding-top: 20px;">
+                    <div class="paper-list-loading"
+                        style="padding: 40px; text-align: center; color: var(--primary); font-weight: 600;">
+                        <span style="display:block; font-size: 24px; margin-bottom: 10px;">⏳</span>
+                        Loading papers from blockchain...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info -->
+        <div class="info-card">
+            <h3>ℹ️ How It Works</h3>
+            <ol style="padding-left: 20px;">
+                <li><strong>Upload PDF</strong> — Select the exam paper PDF file</li>
+                <li><strong>Enter Details</strong> — Provide college ID, subject code, exam date/time, and principal
+                    email</li>
+                <li><strong>AES-256 Encryption</strong> — PDF content is encrypted with military-grade AES-256</li>
+                <li><strong>RSA-4096 Encryption</strong> — AES key is encrypted with RSA-4096 for the principal</li>
+                <li><strong>Blockchain Storage</strong> — Encrypted data stored immutably on Ethereum blockchain</li>
+                <li><strong>Email Delivery</strong> — Paper details (ID, Subject, Timestamp) sent to principal</li>
+                <li><strong>Time-Lock</strong> — Principal can only decrypt after exam date/time is reached</li>
+            </ol>
+
+            <div class="security-badges">
+                <div class="badge">🔐 AES-256</div>
+                <div class="badge">🔑 RSA-4096</div>
+                <div class="badge">⛓️ Ethereum</div>
+                <div class="badge">⏰ Time-Lock</div>
+                <div class="badge">#️⃣ SHA-256</div>
             </div>
         </div>
     </div>
 
+    <!-- PDF Edit Modal -->
+    <div id="pdfModal" class="modal">
+        <div class="modal-content office-editor-content">
+            <!-- Office-style Ribbon Header -->
+            <div class="office-ribbon">
+                <div class="ribbon-tabs">
+                    <div class="ribbon-tab active">Home</div>
+                    <div class="ribbon-tab">Insert</div>
+                    <div class="ribbon-tab">Page Layout</div>
+                    <div class="ribbon-tab">Review</div>
+                    <div class="ribbon-tab">View</div>
+                </div>
+                <div class="ribbon-toolbar">
+                    <div class="toolbar-group">
+                        <div class="toolbar-label">Clipboard</div>
+                        <div class="toolbar-actions">
+                            <button class="ribbon-btn" onclick="savePdfEdits()" title="Save Edits">
+                                <span class="btn-icon">💾</span>
+                                <span class="btn-text">Save</span>
+                            </button>
+                            <button class="ribbon-btn" onclick="closePdfEditor()" title="Cancel">
+                                <span class="btn-icon">❌</span>
+                                <span class="btn-text">Cancel</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <div class="toolbar-group">
+                        <div class="toolbar-label">Font & Text</div>
+                        <div class="toolbar-actions">
+                            <textarea id="add_text_input" placeholder="Enter text..."></textarea>
+                            <button class="ribbon-btn action-btn" onclick="addTextToCanvas()">
+                                <span class="btn-icon">A</span>
+                                <span class="btn-text">Add Text</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <div class="toolbar-group">
+                        <div class="toolbar-label">Illustrations</div>
+                        <div class="toolbar-actions">
+                            <button class="ribbon-btn" onclick="document.getElementById('add_image_input').click()">
+                                <span class="btn-icon">🖼️</span>
+                                <span class="btn-text">Picture</span>
+                            </button>
+                            <input type="file" id="add_image_input" accept="image/*" style="display:none"
+                                onchange="addImageToCanvas(event)">
+                        </div>
+                    </div>
+                    <div class="toolbar-divider"></div>
+                    <div class="toolbar-group">
+                        <div class="toolbar-label">Help</div>
+                        <div class="toolbar-hint">💡 Ctrl+V to Paste Image | Delete to Remove</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="office-editor-workspace">
+                <div id="editorLoadingOverlay" class="editor-loading">
+                    <div class="spinner"></div>
+                    <p>Loading PDF Content...</p>
+                </div>
+                <!-- Pages are dynamically created here by set.js -->
+                <div id="pdfWorkspace"></div>
+            </div>
+
+            <div class="office-status-bar">
+                <span>Page: 1 of 1</span> |
+                <span>Zoom: 100%</span> |
+                <span id="editorStatusText">Ready</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Text Editor Modal (.txt and Write from Scratch) -->
+    <div id="textEditorModal" class="modal">
+        <div class="office-editor-content"
+            style="max-width: 900px; height: 90vh; margin: 5vh auto; border-radius: 12px;">
+            <div class="office-ribbon">
+                <div class="ribbon-tabs">
+                    <div class="ribbon-tab active">Home / Text Editor</div>
+                </div>
+                <div class="ribbon-toolbar" style="height: 60px;">
+                    <div class="toolbar-actions" style="justify-content: space-between; width: 100%;">
+                        <div style="font-size:14px; color:#555; font-weight:600; padding-left:10px;">
+                            ✍️ Write your Question Paper Content
+                        </div>
+                        <button class="btn-primary" style="width: auto; padding: 8px 20px; font-size: 13px; margin:0;"
+                            onclick="saveTextEdits()">
+                            💾 Save & Convert to PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-body">
+                <div class="text-editor-workspace">
+                    <textarea id="textEditorArea"
+                        placeholder="Start typing the question paper... (e.g. Question 1: Explain the components of Blockchain)"></textarea>
+                </div>
+            </div>
+
+            <div class="office-status-bar">
+                <span id="textEditorStatusText">Editing Plain Text</span>
+                <span style="margin-left:auto; cursor:pointer;" onclick="closeTextEditor()">❌ Close Without
+                    Saving</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div id="rescheduleModal" class="modal" style="display:none; justify-content: center; align-items: center; background-color: rgba(13, 31, 76, 0.4); backdrop-filter: blur(4px); position: fixed; z-index: 2000; top: 0; left: 0; width: 100%; height: 100%;">
+        <div class="glass-card" style="width: 100%; max-width: 500px; padding: 40px; position: relative;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px;">
+                <div>
+                    <h2 style="margin-bottom: 4px;">📅 Reschedule Exam</h2>
+                    <p class="subtitle" style="margin-bottom: 0;">Update on-chain exam timestamp</p>
+                </div>
+                <span class="close-modal" onclick="closeRescheduleModal()">&times;</span>
+            </div>
+            
+            <input type="hidden" id="reschedule_paper_id">
+            
+            <div class="form-group">
+                <label for="new_exam_datetime">📅 New Exam Date & Time</label>
+                <input type="datetime-local" id="new_exam_datetime" required>
+                <small>New time must be in the future relative to blockchain time.</small>
+            </div>
+            
+            <button onclick="submitReschedule()" class="btn-primary" id="rescheduleSubmitBtn">
+                ⛓️ Update Blockchain Logic
+            </button>
+            
+            <div id="rescheduleMessage" class="message-toast"></div>
+        </div>
+    </div>
+
     <script src="js/set.js"></script>
+    <script>
+        function togglePaperList() {
+            const wrap = document.getElementById('paperListWrap');
+            const btn = document.getElementById('papersToggleBtn');
+            const chevron = btn.querySelector('.chevron');
+            const refreshBtn = document.getElementById('refreshBtn');
+
+            const isOpen = wrap.classList.toggle('open');
+            if (isOpen) {
+                wrap.style.maxHeight = '2000px';
+                wrap.style.opacity = '1';
+                chevron.style.transform = 'rotate(180deg)';
+                refreshBtn.style.display = 'block';
+                loadPaperList();
+            } else {
+                wrap.style.maxHeight = '0';
+                wrap.style.opacity = '0';
+                chevron.style.transform = 'rotate(0deg)';
+                refreshBtn.style.display = 'none';
+            }
+        }
+
+        function togglePrincipals() {
+            const wrap = document.getElementById('principalsWrap');
+            const btn = document.getElementById('principalsToggleBtn');
+            const sub = document.getElementById('principalsSubtitle');
+            const chevron = btn.querySelector('.chevron');
+
+            const isOpen = wrap.classList.toggle('open');
+            if (isOpen) {
+                wrap.style.maxHeight = '1000px';
+                wrap.style.opacity = '1';
+                chevron.style.transform = 'rotate(180deg)';
+                btn.innerHTML = `Close Manager <span class="chevron" style="font-size: 10px; transition: transform 0.3s; margin-left:8px; transform:rotate(180deg);">▲</span>`;
+                btn.style.background = 'var(--surface2)';
+            } else {
+                wrap.style.maxHeight = '0';
+                wrap.style.opacity = '0';
+                chevron.style.transform = 'rotate(0deg)';
+                btn.innerHTML = `Open Manager <span class="chevron" style="font-size: 10px; transition: transform 0.3s; margin-left:8px;">▼</span>`;
+                btn.style.background = 'var(--primary-light)';
+            }
+        }
+    </script>
 </body>
 
 </html>

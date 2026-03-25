@@ -5,70 +5,536 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Blockchain Exam Verification</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a6fff;
+            --primary-dark: #1255d4;
+            --primary-light: #e8f0fe;
+            --accent: #0cc6e8;
+            --bg: #f0f6ff;
+            --surface: #ffffff;
+            --surface2: #f7faff;
+            --border: #d0e0fa;
+            --text-head: #0d1f4c;
+            --text-body: #2e4070;
+            --text-muted: #7a90bb;
+            --text-input: #0d1f4c;
+            --shadow-card: 0 8px 48px rgba(26, 111, 255, 0.10), 0 2px 12px rgba(26, 111, 255, 0.06);
+            --shadow-btn: 0 6px 24px rgba(26, 111, 255, 0.30);
+            --radius-card: 22px;
+            --radius-input: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            position: relative;
+            overflow-y: auto;
+            padding: 40px 20px;
+        }
+
+        /* ── Background mesh ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 20%, rgba(26, 111, 255, 0.10) 0%, transparent 60%),
+                radial-gradient(ellipse 60% 55% at 85% 75%, rgba(12, 198, 232, 0.09) 0%, transparent 60%),
+                radial-gradient(ellipse 45% 40% at 55% 5%, rgba(26, 111, 255, 0.06) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Floating orbs ── */
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 18s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 340px;
+            height: 340px;
+            top: -80px;
+            left: -80px;
+            background: rgba(26, 111, 255, 0.08);
+            animation-duration: 20s;
+        }
+
+        .orb-2 {
+            width: 280px;
+            height: 280px;
+            bottom: -60px;
+            right: -60px;
+            background: rgba(12, 198, 232, 0.07);
+            animation-duration: 16s;
+            animation-delay: -6s;
+        }
+
+        .orb-3 {
+            width: 200px;
+            height: 200px;
+            top: 40%;
+            left: 70%;
+            background: rgba(26, 111, 255, 0.05);
+            animation-duration: 24s;
+            animation-delay: -10s;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(30px, 40px) scale(1.08);
+            }
+        }
+
+        /* ── Grid pattern overlay ── */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(26, 111, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 111, 255, 0.03) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+
+        /* ── Card ── */
+        .login-container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 460px;
+        }
+
+        .login-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 48px 44px;
+            box-shadow: var(--shadow-card);
+            animation: slideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(28px);
+        }
+
+        @keyframes slideUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── Header ── */
+        .login-header {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .login-icon {
+            width: 68px;
+            height: 68px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 28px;
+            box-shadow: 0 8px 28px rgba(26, 111, 255, 0.28);
+            animation: glow 3s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 8px 28px rgba(26, 111, 255, 0.28);
+            }
+
+            50% {
+                box-shadow: 0 8px 40px rgba(26, 111, 255, 0.45);
+            }
+        }
+
+        .login-header h1 {
+            font-family: 'Sora', sans-serif;
+            color: var(--text-head);
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+        }
+
+        .login-header p {
+            color: var(--text-muted);
+            font-size: 13.5px;
+            font-weight: 400;
+        }
+
+        /* ── Role toggle ── */
+        .role-toggle {
+            display: flex;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 30px;
+            gap: 4px;
+        }
+
+        .role-toggle-btn {
+            flex: 1;
+            padding: 11px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 11px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .role-toggle-btn.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(26, 111, 255, 0.30);
+        }
+
+        .role-toggle-btn:hover:not(.active) {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        /* ── Form ── */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            color: var(--text-body);
+            font-size: 12.5px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 16px;
+            transition: color 0.25s;
+            pointer-events: none;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 13px 16px 13px 44px;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-input);
+            color: var(--text-input);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            outline: none;
+        }
+
+        .input-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(26, 111, 255, 0.09);
+        }
+
+        .input-wrapper input:focus~.icon {
+            color: var(--primary);
+        }
+
+        .input-wrapper:focus-within .icon {
+            color: var(--primary);
+        }
+
+        /* ── Button ── */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), #1a8fff);
+            color: #fff;
+            border: none;
+            border-radius: 13px;
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            transition: all 0.28s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-btn);
+            letter-spacing: 0.2px;
+        }
+
+        .login-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 32px rgba(26, 111, 255, 0.38);
+        }
+
+        .login-btn:hover::after {
+            opacity: 1;
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn .spinner {
+            display: none;
+            width: 17px;
+            height: 17px;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        .login-btn.loading .spinner {
+            display: block;
+        }
+
+        .login-btn.loading .btn-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── Message toast ── */
+        .message-toast {
+            margin-top: 18px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 500;
+            display: none;
+            text-align: center;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .message-toast.success {
+            background: #eafaf1;
+            color: #1a7a40;
+            border: 1px solid #b7e7cb;
+            display: block;
+        }
+
+        .message-toast.error {
+            background: #fff1f2;
+            color: #c0392b;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+
+
+        /* ── Footer ── */
+        .login-footer {
+            text-align: center;
+            margin-top: 22px;
+            color: var(--text-muted);
+            font-size: 11px;
+            letter-spacing: 0.3px;
+        }
+
+        .login-footer span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* ── Security badges ── */
+        .security-badges {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 14px;
+        }
+
+        .badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: var(--primary-light);
+            border: 1px solid rgba(26, 111, 255, 0.18);
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 10.5px;
+            font-weight: 600;
+            color: var(--primary);
+            letter-spacing: 0.3px;
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .login-card {
+                padding: 36px 22px;
+            }
+
+            .login-header h1 {
+                font-size: 21px;
+            }
+
+            .cred-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="container">
-        <div class="login-box">
-            <div class="header">
-                <h1>🎓 Blockchain Exam Verification</h1>
+
+    <!-- Ambient background -->
+    <div class="grid-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+
+            <!-- Header -->
+            <div class="login-header">
+                <div class="login-icon">🔗</div>
+                <h1>Blockchain Exam Verification</h1>
                 <p>Secure Exam Paper Distribution System</p>
             </div>
 
-            <div class="login-form">
-                <h2>Login</h2>
+            <!-- Role Selection -->
+            <div class="role-toggle">
+                <button class="role-toggle-btn active" id="adminBtn" onclick="selectRole('admin', this)">
+                    💼 Admin
+                </button>
+                <button class="role-toggle-btn" id="principalBtn" onclick="selectRole('principal', this)">
+                    🎓 Principal
+                </button>
+            </div>
 
-                <div class="role-selector">
-                    <button class="role-btn active" onclick="selectRole('admin')">
-                        👨‍💼 Admin
-                    </button>
-                    <button class="role-btn" onclick="selectRole('principal')">
-                        👨‍🎓 Principal
-                    </button>
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="register_no">Register Number</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🆔</span>
+                        <input type="text" id="register_no" name="register_no" required placeholder="Enter your id">
+                    </div>
                 </div>
 
-                <form id="loginForm" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label for="register_no">Register Number</label>
-                        <input type="text" id="register_no" name="register_no" required
-                            placeholder="Enter your register number">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="password">Password</label>
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="icon">🔒</span>
                         <input type="password" id="password" name="password" required placeholder="Enter your password">
                     </div>
-
-                    <input type="hidden" id="role" name="role" value="admin">
-
-                    <button type="submit" class="btn-primary">
-                        🔐 Login
-                    </button>
-                </form>
-
-                <div id="message" class="message"></div>
-
-                <div class="demo-credentials">
-                    <h3>Demo Credentials</h3>
-                    <div class="credentials-grid">
-                        <div>
-                            <strong>Admin:</strong><br>
-                            Register No: ADMIN001<br>
-                            Password: admin123
-                        </div>
-                        <div>
-                            <strong>Principal:</strong><br>
-                            Register No: PRIN001<br>
-                            Password: principal123
-                        </div>
-                    </div>
                 </div>
+
+                <input type="hidden" id="role" name="role" value="admin">
+
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span class="btn-text">Sign In →</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
+
+            <div id="message" class="message-toast"></div>
+
+            <!-- Security badges -->
+            <div class="security-badges">
+                <div class="badge">🔐 AES-256</div>
+                <div class="badge">🔑 RSA-4096</div>
+                <div class="badge">⛓ Ethereum</div>
+            </div>
+
+
+
+            <!-- Footer -->
+            <div class="login-footer">
+                Secured with <span>Ethereum Blockchain</span> technology
             </div>
         </div>
     </div>
 
     <script src="js/login.js"></script>
+
 </body>
 
 </html>

@@ -1,0 +1,19 @@
+# Data and Keys
+backend/keys/
+backend/encrypted_pdfs/
+backend/downloads/
+backend/uploads/
+blockchain/ganache_db/
+blockchain/node_modules/
+
+# Files
+*.key
+*.pem
+*.pyc
+*.pyo
+*.log
+.DS_Store
+
+# Virtual Environments
+.venv/
+__pycache__/

@@ -3,7 +3,7 @@ Flask REST API - Main application
 Endpoints for authentication, paper storage, and verification
 """
 
-from flask import Flask, request, jsonify, send_file, session
+from flask import Flask, request, jsonify, send_file, session, send_from_directory
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 import os
@@ -17,9 +17,10 @@ from contract_loader import ContractLoader
 from auth_service import AuthService
 from paper_service import PaperService
 
-# Initialize Flask app
-app = Flask(__name__)
-app.secret_key = 'your-secret-key-change-in-production'  # Change this!
+# Initialize Flask app - serve frontend files from ../frontend
+FRONTEND_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'frontend')
+app = Flask(__name__, static_folder=FRONTEND_DIR, static_url_path='')
+app.secret_key = 'your-secret-key-change-in-production'
 CORS(app, supports_credentials=True)
 
 # Configuration
@@ -91,13 +92,35 @@ def register():
 def login():
     """User login"""
     try:
-        data = request.json
+        # Use force=True to handle cases where Content-Type might be missing or wrong
+        data = request.get_json(force=True, silent=True)
+        print(f"📥 Login attempt: {data}")
+        
+        if not data:
+            # Try getting from form data as fallback
+            data = request.form.to_dict()
+            if not data:
+                print("❌ No data found in request")
+                return jsonify({'success': False, 'error': 'No login data received'}), 400
+                
+        # Handle cases where data might be a string (happens sometimes with webview)
+        if isinstance(data, str):
+            try:
+                data = json.loads(data)
+            except:
+                pass
+
+        if not isinstance(data, dict) or 'register_no' not in data or 'password' not in data:
+            print(f"❌ Invalid login request data structure: {type(data)}")
+            return jsonify({'success': False, 'error': 'Invalid request data structure'}), 400
+            
         success, user_or_error, session_token = auth_service.login(
             data['register_no'],
             data['password']
         )
         
         if success:
+            print(f"✅ Login successful: {data['register_no']}")
             return jsonify({
                 'success': True,
                 'session_token': session_token,
@@ -109,8 +132,10 @@ def login():
                 }
             })
         else:
+            print(f"❌ Login failed: {user_or_error}")
             return jsonify({'success': False, 'error': user_or_error}), 401
     except Exception as e:
+        print(f"🔥 Login exception: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 400
 
 @app.route('/api/logout', methods=['POST'])
@@ -175,6 +200,64 @@ def store_paper(user_data):
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/admin/papers', methods=['GET'])
+@require_auth(role='admin')
+def list_admin_papers(user_data):
+    """Admin endpoint to list all uploaded papers"""
+    try:
+        total_papers = contract_loader.get_total_papers()
+        papers = []
+        
+        for i in range(1, total_papers + 1):
+            try:
+                paper = contract_loader.get_paper(i)
+                papers.append({
+                    'paper_id': i,
+                    'college_id': paper['collegeId'],
+                    'subject_code': paper['subjectCode'],
+                    'timestamp': paper['timestamp'],
+                    'verified': paper['verified'],
+                    'exam_datetime': paper['examDateTime'],
+                    'principal_email': paper['principalEmail']
+                })
+            except:
+                continue
+        
+        return jsonify({
+            'success': True,
+            'data': {
+                'total': total_papers,
+                'papers': papers
+            }
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/admin/reschedule-paper', methods=['POST'])
+@require_auth(role='admin')
+def reschedule_paper(user_data):
+    """Admin endpoint to reschedule an exam"""
+    try:
+        data = request.json
+        paper_id = data.get('paper_id')
+        new_exam_datetime = data.get('new_exam_datetime')
+        
+        if not paper_id or not new_exam_datetime:
+            return jsonify({'success': False, 'error': 'Missing paper_id or new_exam_datetime'}), 400
+        
+        success, result = paper_service.admin_reschedule_exam(paper_id, new_exam_datetime)
+        
+        if success:
+            return jsonify({
+                'success': True,
+                'data': result
+            })
+        else:
+            return jsonify({'success': False, 'error': result}), 400
+            
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 # ============= PRINCIPAL ENDPOINTS =============
 
 @app.route('/api/principal/verify-paper/<int:paper_id>', methods=['GET'])
@@ -209,15 +292,11 @@ def decrypt_paper(user_data):
         if package_file.filename == '':
             return jsonify({'success': False, 'error': 'No file selected'}), 400
         
-        # Read package data
+        # Read package data (Raw binary bytes for .pdf.enc)
         package_content = package_file.read()
-        try:
-            package_data = json.loads(package_content)
-        except (ValueError, UnicodeDecodeError):
-            return jsonify({
-                'success': False, 
-                'error': 'Invalid package file. Please upload the .json encrypted package file, not the PDF.'
-            }), 400
+        
+        if not package_content:
+            return jsonify({'success': False, 'error': 'Empty package file'}), 400
         
         # Get paper ID and college ID from form
         paper_id = int(request.form.get('paper_id'))
@@ -226,7 +305,7 @@ def decrypt_paper(user_data):
         # Decrypt paper
         success, result = paper_service.principal_decrypt_paper(
             paper_id,
-            package_data,
+            package_content,
             college_id
         )
         
@@ -269,7 +348,7 @@ def get_paper(paper_id):
                 'data': public_data
             })
         else:
-            return jsonify({'success': False, 'error': result}), 400
+            return jsonify({'success': False, 'error': result}), 400  
             
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -296,10 +375,14 @@ def get_stats():
 @app.route('/api/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
+    try:
+        bc_connected = web3_client.w3.is_connected()
+    except:
+        bc_connected = False
     return jsonify({
         'success': True,
         'message': 'API is running',
-        'blockchain_connected': web3_client.w3.is_connected()
+        'blockchain_connected': bc_connected
     })
 
 # ============= ERROR HANDLERS =============
@@ -312,6 +395,16 @@ def not_found(error):
 def internal_error(error):
     return jsonify({'success': False, 'error': 'Internal server error'}), 500
 
+# ============= SERVE FRONTEND =============
+
+@app.route('/')
+def serve_index():
+    return send_from_directory(FRONTEND_DIR, 'login.html')
+
+@app.route('/<path:filename>')
+def serve_frontend(filename):
+    return send_from_directory(FRONTEND_DIR, filename)
+
 # ============= MAIN =============
 
 if __name__ == '__main__':
@@ -320,16 +413,8 @@ if __name__ == '__main__':
     print("="*60)
     print("📡 API Server starting...")
     print("🌐 Access at: http://localhost:5000")
-    print("📚 API Documentation:")
-    print("   POST   /api/register")
-    print("   POST   /api/login")
-    print("   POST   /api/logout")
-    print("   POST   /api/admin/store-paper")
-    print("   GET    /api/principal/verify-paper/<paper_id>")
-    print("   POST   /api/principal/decrypt-paper")
-    print("   GET    /api/paper/<paper_id>")
-    print("   GET    /api/stats")
-    print("   GET    /api/health")
+    print("🌐 Admin:     http://localhost:5000/set.html")
+    print("🌐 Principal: http://localhost:5000/get.html")
     print("="*60 + "\n")
     
     app.run(debug=True, host='0.0.0.0', port=5000)

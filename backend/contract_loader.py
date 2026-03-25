@@ -136,12 +136,46 @@ class ContractLoader:
             return tx_hash.hex()
         except Exception as e:
             raise Exception(f"Failed to verify paper: {str(e)}")
+
+    def reschedule_exam(self, paper_id, new_exam_datetime):
+        """Update exam scheduled time on blockchain"""
+        try:
+            txn = self.contract.functions.rescheduleExam(paper_id, new_exam_datetime).build_transaction({
+                'from': self.account.address,
+                'nonce': self.w3.eth.get_transaction_count(self.account.address),
+                'gas': 200000,
+                'gasPrice': self.w3.eth.gas_price
+            })
+            
+            signed_txn = self.w3.eth.account.sign_transaction(txn, private_key=self.account.key)
+            tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+            tx_receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash)
+            
+            if tx_receipt.status == 0:
+                raise Exception("Transaction reverted. Make sure you are the author and paper is not verified.")
+                
+            return tx_hash.hex()
+        except Exception as e:
+            raise Exception(f"Failed to reschedule exam: {str(e)}")
     
+    def get_blockchain_time(self):
+        """Get the current timestamp from the latest block (Consensus Time)"""
+        try:
+            # IMPORTANT: For local development (Ganache), the blockchain clock 
+            # stops if no transactions occur. We force a sync with system time 
+            # to ensure the "Real-World" experience where time actually moves.
+            self.w3_client.sync_blockchain_time()
+            return self.w3.eth.get_block('latest').timestamp
+        except Exception as e:
+            # Fallback to system time if blockchain is unreachable
+            import time
+            return int(time.time())
+
     def is_exam_time_reached(self, paper_id):
         """Check if exam time has been reached (time-lock)"""
         try:
-            # First, force synchronize the local blockchain clock with real time
-            self.w3_client.sync_blockchain_time()
+            # Sync time before checking to ensure accurate development environment
+            self.get_blockchain_time()
             return self.contract.functions.isExamTimeReached(paper_id).call()
         except Exception as e:
             raise Exception(f"Failed to check exam time: {str(e)}")

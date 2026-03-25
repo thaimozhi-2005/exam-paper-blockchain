@@ -5,198 +5,781 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GET - Principal Portal</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="lib/pdf.min.js?v=5"></script>
+    <style>
+        :root {
+            --primary: #1a6fff;
+            --primary-dark: #1255d4;
+            --primary-light: #e8f0fe;
+            --accent: #0cc6e8;
+            --success: #2ed573;
+            --success-dark: #1a7a40;
+            --success-light: #eafaf1;
+            --bg: #f0f6ff;
+            --surface: #ffffff;
+            --surface2: #f7faff;
+            --border: #d0e0fa;
+            --text-head: #0d1f4c;
+            --text-body: #2e4070;
+            --text-muted: #7a90bb;
+            --text-input: #0d1f4c;
+            --shadow-card: 0 8px 48px rgba(26, 111, 255, 0.10), 0 2px 12px rgba(26, 111, 255, 0.06);
+            --shadow-btn: 0 6px 24px rgba(26, 111, 255, 0.30);
+            --radius-card: 22px;
+            --radius-input: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            min-height: 100vh;
+            background: var(--bg);
+            padding: 40px 20px;
+            color: var(--text-body);
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* ── Background mesh ── */
+        .grid-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(26, 111, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(26, 111, 255, 0.03) 1px, transparent 1px);
+            background-size: 44px 44px;
+        }
+
+        .orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+            animation: drift 18s infinite ease-in-out alternate;
+        }
+
+        .orb-1 {
+            width: 340px;
+            height: 340px;
+            top: -80px;
+            left: -80px;
+            background: rgba(26, 111, 255, 0.08);
+        }
+
+        .orb-2 {
+            width: 280px;
+            height: 280px;
+            bottom: -60px;
+            right: -60px;
+            background: rgba(12, 198, 232, 0.07);
+            animation-delay: -6s;
+        }
+
+        @keyframes drift {
+            from {
+                transform: translate(0, 0) scale(1);
+            }
+
+            to {
+                transform: translate(30px, 40px) scale(1.08);
+            }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ── Header Bar ── */
+        .header-bar {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px 32px;
+            border-radius: var(--radius-card);
+            margin-bottom: 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-card);
+        }
+
+        .header-bar h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-head);
+            letter-spacing: -0.5px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info span {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .btn-logout {
+            padding: 10px 24px;
+            background: #fff;
+            color: #ff4757;
+            border: 1.5px solid #ff4757;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: #ff4757;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2);
+        }
+
+        /* ── Glass Card ── */
+        .glass-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 48px;
+            box-shadow: var(--shadow-card);
+            margin-bottom: 32px;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .glass-card h2 {
+            font-family: 'Sora', sans-serif;
+            color: var(--text-head);
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .glass-card .subtitle {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-weight: 400;
+            margin-bottom: 32px;
+        }
+
+        /* ── Tabs ── */
+        .tabs {
+            display: flex;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 32px;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 11px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .tab-btn.active {
+            background: var(--success);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(46, 213, 115, 0.3);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: var(--success-light);
+            color: var(--success);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ── Form Styles ── */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            color: var(--text-body);
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 14px 20px;
+            background: var(--surface2);
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-input);
+            color: var(--text-head);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .form-group input:focus {
+            background: #fff;
+            border-color: var(--success);
+            box-shadow: 0 0 0 4px rgba(46, 213, 115, 0.08);
+        }
+
+        .form-group input[type="file"] {
+            padding: 12px;
+            cursor: pointer;
+        }
+
+        .form-group input[type="file"]::file-selector-button {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-right: 12px;
+            transition: 0.3s;
+        }
+
+        .form-group input[type="file"]::file-selector-button:hover {
+            background: var(--success-dark);
+        }
+
+        /* ── Buttons ── */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--success), #26de81);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            box-shadow: 0 6px 24px rgba(46, 213, 115, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(46, 213, 115, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 12px 24px;
+            background: var(--surface2);
+            color: var(--success);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--success-light);
+            border-color: var(--success);
+        }
+
+        /* ── Paper Details ── */
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1.5px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-item .label {
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 13.5px;
+        }
+
+        .detail-item .value {
+            color: var(--text-head);
+            font-weight: 700;
+            font-size: 14px;
+            text-align: right;
+        }
+
+        .detail-item .value.hash {
+            font-family: monospace;
+            color: var(--primary);
+            font-size: 12px;
+        }
+
+        /* ── Time Lock ── */
+        .time-lock-status {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin: 24px 0;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .time-lock-status.unlocked {
+            background: var(--success-light);
+            border: 1.5px solid #b7e7cb;
+            color: var(--success-dark);
+        }
+
+        .time-lock-status.locked {
+            background: #fff8e1;
+            border: 1.5px solid #ffe082;
+            color: #f57c00;
+        }
+
+        /* ── Progress Section ── */
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            background: var(--surface2);
+            border-radius: 10px;
+            border: 1.5px solid var(--border);
+            margin-bottom: 10px;
+        }
+
+        .step.active {
+            background: var(--success-light);
+            border-color: var(--success);
+        }
+
+        .step.completed {
+            background: var(--success-light);
+            border-color: var(--success);
+        }
+
+        .step.completed .step-text {
+            color: var(--success-dark);
+        }
+
+        .step-text {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* ── Success UI ── */
+        .green-tick {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--success), #7bed9f);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(46, 213, 115, 0.4);
+        }
+
+        /* ── Info Card ── */
+        .info-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-card);
+            padding: 40px;
+            margin-top: 32px;
+            box-shadow: var(--shadow-card);
+        }
+
+        .info-card h3 {
+            color: var(--text-head);
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .info-card li {
+            margin-bottom: 12px;
+            line-height: 1.6;
+            font-size: 14.5px;
+            color: var(--text-body);
+        }
+
+        .security-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 6px 14px;
+            background: var(--success-light);
+            border: 1px solid rgba(46, 213, 115, 0.18);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--success-dark);
+        }
+
+        /* ── Error Styles ── */
+        .error-box {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+        }
+
+        .error-box h3 {
+            color: #c53030;
+            margin-bottom: 12px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .error-box p {
+            color: #742a2a;
+            font-size: 14.5px;
+            line-height: 1.6;
+        }
+
+        .clock-warning {
+            background: #fffaf0;
+            border: 2px solid #ed8936;
+            color: #9c4221;
+            padding: 16px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(237, 137, 54, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 10px rgba(237, 137, 54, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(237, 137, 54, 0);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .header-bar {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .glass-card {
+                padding: 32px 24px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div class="grid-bg"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
     <div class="container">
+        <!-- Header -->
         <div class="header-bar">
-            <h1>👨‍🎓 Principal Portal - GET</h1>
+            <h1>🎓 Principal Portal — GET</h1>
             <div class="user-info">
                 <span id="userName">Principal</span>
                 <button onclick="logout()" class="btn-logout">Logout</button>
             </div>
         </div>
 
-        <div class="main-content">
-            <div class="verify-section">
-                <h2>🔍 Verify & Decrypt Exam Paper</h2>
-                <p class="subtitle">Upload encrypted package and verify authenticity</p>
+        <!-- Main Card -->
+        <div class="glass-card">
+            <h2>🔍 Verify & Decrypt Exam Paper</h2>
+            <p class="subtitle">Verify authenticity and decrypt your exam paper from the blockchain</p>
 
-                <div class="tabs">
-                    <button class="tab-btn active" onclick="switchTab('verify')">
-                        Step 1: Verify Paper
-                    </button>
-                    <button class="tab-btn" onclick="switchTab('decrypt')">
-                        Step 2: Decrypt Paper
-                    </button>
-                </div>
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" id="tab-verify" onclick="switchTab('verify')">Step 1: Verify
+                    Paper</button>
+                <button class="tab-btn" id="tab-decrypt" onclick="switchTab('decrypt')">Step 2: Decrypt Paper</button>
+            </div>
 
-                <!-- Step 1: Verify Paper -->
-                <div id="verifyTab" class="tab-content active">
-                    <form id="verifyForm" onsubmit="handleVerify(event)">
-                        <div class="form-group">
-                            <label for="paper_id_verify">📋 Paper ID</label>
-                            <input type="number" id="paper_id_verify" name="paper_id" required
-                                placeholder="Enter Paper ID from email">
-                        </div>
-
-                        <button type="submit" class="btn-primary">
-                            🔍 Fetch Paper Details
-                        </button>
-                    </form>
-
-                    <div id="paperDetails" class="paper-details" style="display: none;">
-                        <h3>📄 Paper Information</h3>
-                        <div class="details-grid">
-                            <div class="detail-item">
-                                <span class="label">Paper ID:</span>
-                                <span class="value" id="detailPaperId"></span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">College ID:</span>
-                                <span class="value" id="detailCollegeId"></span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Subject Code:</span>
-                                <span class="value" id="detailSubjectCode"></span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Exam Date/Time:</span>
-                                <span class="value" id="detailExamDateTime"></span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Document Hash:</span>
-                                <span class="value hash" id="detailDocHash"></span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="label">Verified:</span>
-                                <span class="value" id="detailVerified"></span>
-                            </div>
-                        </div>
-
-                        <div id="timeLockStatus" class="time-lock-status">
-                            <!-- Will be populated dynamically -->
-                        </div>
-
-                        <button onclick="switchTab('decrypt')" class="btn-primary">
-                            Proceed to Decryption →
-                        </button>
+            <!-- Step 1: Verify -->
+            <div id="verifyTab" class="tab-content active">
+                <form id="verifyForm" onsubmit="handleVerify(event)">
+                    <div class="form-group">
+                        <label for="paper_id_verify">📋 Paper ID</label>
+                        <input type="number" id="paper_id_verify" name="paper_id" required
+                            placeholder="Enter Paper ID from email">
                     </div>
-                </div>
+                    <button type="submit" class="btn-primary">🔍 Fetch Paper Details</button>
+                </form>
 
-                <!-- Step 2: Decrypt Paper -->
-                <div id="decryptTab" class="tab-content">
-                    <form id="decryptForm" onsubmit="handleDecrypt(event)">
-                        <div class="form-group">
-                            <label for="paper_id_decrypt">📋 Paper ID</label>
-                            <input type="number" id="paper_id_decrypt" name="paper_id" required
-                                placeholder="Enter Paper ID">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="package_file">📦 Encrypted Package File</label>
-                            <input type="file" id="package_file" name="package_file" accept=".json" required>
-                            <small>Upload the encrypted_paper_*.json file from email</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="college_id_decrypt">🏫 College ID</label>
-                            <input type="text" id="college_id_decrypt" name="college_id" required
-                                placeholder="Your College ID">
-                        </div>
-
-                        <button type="submit" class="btn-primary" id="decryptBtn">
-                            🔓 Decrypt & Download PDF
-                        </button>
-                    </form>
-
-                    <div id="decryptProgress" class="progress-section" style="display: none;">
-                        <h3>Decrypting...</h3>
-                        <div class="progress-steps">
-                            <div class="step" id="decrypt-step1">
-                                <div class="step-icon">⏳</div>
-                                <div class="step-text">Time-Lock Verification</div>
-                            </div>
-                            <div class="step" id="decrypt-step2">
-                                <div class="step-icon">⏳</div>
-                                <div class="step-text">Fetching Blockchain Data</div>
-                            </div>
-                            <div class="step" id="decrypt-step3">
-                                <div class="step-icon">⏳</div>
-                                <div class="step-text">RSA Decryption</div>
-                            </div>
-                            <div class="step" id="decrypt-step4">
-                                <div class="step-icon">⏳</div>
-                                <div class="step-text">AES Decryption</div>
-                            </div>
-                            <div class="step" id="decrypt-step5">
-                                <div class="step-icon">⏳</div>
-                                <div class="step-text">Hash Verification</div>
-                            </div>
-                        </div>
+                <div id="paperDetails" class="paper-details" style="display: none; margin-top: 32px;">
+                    <h3>📄 Paper Information</h3>
+                    <div class="details-grid" style="margin-top: 16px;">
+                        <div class="detail-item"><span class="label">Paper ID</span><span class="value"
+                                id="detailPaperId"></span></div>
+                        <div class="detail-item"><span class="label">College ID</span><span class="value"
+                                id="detailCollegeId"></span></div>
+                        <div class="detail-item"><span class="label">Subject Code</span><span class="value"
+                                id="detailSubjectCode"></span></div>
+                        <div class="detail-item"><span class="label">Exam Date/Time</span><span class="value"
+                                id="detailExamDateTime"></span></div>
+                        <div class="detail-item"><span class="label">Document Hash</span><span class="value hash"
+                                id="detailDocHash"></span></div>
+                        <div class="detail-item"><span class="label">Verified</span><span class="value"
+                                id="detailVerified"></span></div>
+                        <div class="detail-item"
+                            style="background: var(--primary-light); border: 1.5px dashed var(--primary);"><span
+                                class="label" style="color: var(--primary);">🌐 Blockchain Time</span><span
+                                class="value" id="detailBlockchainTime"
+                                style="font-weight: 800; color: var(--primary);"></span></div>
                     </div>
 
-                    <div id="decryptSuccess" class="success-section" style="display: none;">
-                        <div class="success-box">
-                            <div class="green-tick">✓</div>
-                            <h3>Paper Verified & Decrypted Successfully!</h3>
-                            <p>The exam paper has been authenticated and is ready for download.</p>
+                    <div id="timeLockStatus" class="time-lock-status"></div>
 
-                            <div class="verification-badges">
-                                <div class="badge success">✓ Time-Lock Passed</div>
-                                <div class="badge success">✓ Blockchain Verified</div>
-                                <div class="badge success">✓ Hash Matched</div>
-                                <div class="badge success">✓ Decryption Complete</div>
-                            </div>
-
-                            <p class="download-info">
-                                Your decrypted PDF has been downloaded automatically.
-                            </p>
-
-                            <button onclick="resetDecrypt()" class="btn-secondary">
-                                Verify Another Paper
-                            </button>
-                        </div>
-                    </div>
-
-                    <div id="decryptError" class="error-section" style="display: none;">
-                        <div class="error-box">
-                            <h3>❌ Decryption Failed</h3>
-                            <p id="decryptErrorMessage"></p>
-                            <button onclick="resetDecrypt()" class="btn-secondary">Try Again</button>
-                        </div>
-                    </div>
+                    <button onclick="switchTab('decrypt')" class="btn-primary" style="margin-top: 24px;">Proceed to
+                        Decryption →</button>
                 </div>
             </div>
 
-            <div class="info-section">
-                <h3>ℹ️ Verification Process</h3>
-                <ol>
-                    <li><strong>Step 1:</strong> Enter Paper ID from email to fetch details from blockchain</li>
-                    <li><strong>Time-Lock Check:</strong> System verifies exam date/time has been reached</li>
-                    <li><strong>Step 2:</strong> Upload encrypted package file (.json)</li>
-                    <li><strong>RSA Decryption:</strong> Your private key decrypts the AES key</li>
-                    <li><strong>AES Decryption:</strong> AES key decrypts the PDF content</li>
-                    <li><strong>Hash Verification:</strong> Document hash is verified against blockchain</li>
-                    <li><strong>Green Tick:</strong> Visual confirmation of successful verification</li>
-                    <li><strong>Download:</strong> Authenticated PDF is ready for use</li>
-                </ol>
+            <!-- Step 2: Decrypt -->
+            <div id="decryptTab" class="tab-content">
+                <form id="decryptForm" onsubmit="handleDecrypt(event)">
+                    <div class="form-group">
+                        <label for="paper_id_decrypt">📋 Paper ID</label>
+                        <input type="number" id="paper_id_decrypt" name="paper_id" required
+                            placeholder="Enter Paper ID">
+                    </div>
 
-                <div class="security-info">
-                    <h4>🔒 Security Features</h4>
-                    <ul>
-                        <li>⏰ Time-lock prevents early access</li>
-                        <li>⛓️ Blockchain ensures immutability</li>
-                        <li>🔐 Military-grade encryption (AES-256 + RSA-4096)</li>
-                        <li>✓ Hash verification detects tampering</li>
-                    </ul>
+                    <div class="form-group">
+                        <label for="package_file">🔒 Encrypted PDF File</label>
+                        <input type="file" id="package_file" name="package_file" accept=".pdf" required>
+                        <small style="color: var(--text-muted); display: block; margin-top: 6px;">Upload the securely
+                            encrypted paper_*.pdf file straight from your email</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="college_id_decrypt">🏫 College ID</label>
+                        <input type="text" id="college_id_decrypt" name="college_id" required
+                            placeholder="Your College ID">
+                    </div>
+
+                    <button type="submit" class="btn-primary" id="decryptBtn">🔓 Decrypt & Download PDF</button>
+                </form>
+
+                <!-- Decrypt Progress -->
+                <div id="decryptProgress" class="progress-section" style="display: none; margin-top: 32px;">
+                    <h3 style="margin-bottom: 20px; font-size: 16px;">Decrypting...</h3>
+                    <div class="progress-steps">
+                        <div class="step" id="decrypt-step1">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">Time-Lock Verification</div>
+                        </div>
+                        <div class="step" id="decrypt-step2">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">Fetching Blockchain Data</div>
+                        </div>
+                        <div class="step" id="decrypt-step3">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">RSA Decryption</div>
+                        </div>
+                        <div class="step" id="decrypt-step4">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">AES Decryption</div>
+                        </div>
+                        <div class="step" id="decrypt-step5">
+                            <div class="step-icon">⏳</div>
+                            <div class="step-text">Hash Verification</div>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Decrypt Success -->
+                <div id="decryptSuccess" class="success-section" style="display: none;">
+                    <div class="success-box">
+                        <div class="green-tick">✓</div>
+                        <h3>Paper Verified & Decrypted Successfully!</h3>
+                        <p style="margin-bottom: 24px;">The exam paper has been fully authenticated.</p>
+
+                        <div class="verification-badges"
+                            style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 24px;">
+                            <div class="badge"
+                                style="background: var(--success-light); color: var(--success-dark); border: 1.5px solid #b7e7cb;">
+                                ✓ Time-Lock Passed</div>
+                            <div class="badge"
+                                style="background: var(--success-light); color: var(--success-dark); border: 1.5px solid #b7e7cb;">
+                                ✓ Blockchain Verified</div>
+                            <div class="badge"
+                                style="background: var(--success-light); color: var(--success-dark); border: 1.5px solid #b7e7cb;">
+                                ✓ Hash Matched</div>
+                            <div class="badge"
+                                style="background: var(--success-light); color: var(--success-dark); border: 1.5px solid #b7e7cb;">
+                                ✓ Decryption Complete</div>
+                        </div>
+
+                        <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                            <button id="viewPdfBtn" class="btn-primary" style="flex: 1;" onclick="viewDecryptedPdf()">
+                                👁️ View Document
+                            </button>
+                            <button id="downloadPdfBtn" class="btn-secondary" style="flex: 1;"
+                                onclick="downloadDecryptedPdf()">
+                                ⬇️ Download PDF
+                            </button>
+                        </div>
+
+                        <button onclick="resetDecrypt()" class="btn-secondary"
+                            style="width: 100%; border: none; background: transparent; text-decoration: underline;">Verify
+                            Another Paper</button>
+                    </div>
+                </div>
+
+                <!-- Decrypt Error -->
+                <div id="decryptError" class="error-section" style="display: none;">
+                    <div class="error-box">
+                        <h3>❌ Incase of Decryption Failed</h3>
+                        <p id="decryptErrorMessage" style="margin-bottom: 20px;"></p>
+                        <button onclick="resetDecrypt()" class="btn-secondary" style="width: 100%;">Try Again</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Viewer Modal -->
+        <div id="pdfViewerModal"
+            style="display: none; position: fixed; inset: 0; background: rgba(13,31,76,0.9); z-index: 1000; flex-direction: column;">
+            <div <div
+                style="padding: 16px 24px; background: #fff; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-family: 'Sora', sans-serif; color: var(--text-head); font-size: 18px;">📄 Decrypted Exam
+                    Paper</h3>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn-primary" style="padding: 8px 16px; width: auto;"
+                        onclick="downloadDecryptedPdf()">⬇️ Download</button>
+                    <button class="btn-secondary"
+                        style="padding: 8px 16px; width: auto; color: #ff4757; border-color: #ff4757;"
+                        onclick="closePdfViewer()">❌ Close</button>
+                </div>
+            </div>
+
+            <div id="pdfRenderContainer"
+                style="flex: 1; padding: 24px; background: #333; overflow-y: auto; display: flex; flex-direction: column; align-items: center; gap: 24px;">
+                <!-- PDF.js will render canvas pages here -->
+                <div id="pdfLoadingText" style="color: white; font-family: 'DM Sans', sans-serif;">⏳ Rebuilding PDF
+                    Pages...</div>
             </div>
         </div>
     </div>
 
+    <!-- Info Card -->
+    <div class="info-card">
+        <h3>ℹ️ Verification Process</h3>
+        <ol style="padding-left: 20px;">
+            <li><strong>Step 1:</strong> Enter Paper ID from email to fetch details from blockchain</li>
+            <li><strong>Time-Lock Check:</strong> System verifies exam date/time has been reached</li>
+            <li><strong>Step 2:</strong> Upload encrypted package file (.json)</li>
+            <li><strong>RSA Decryption:</strong> Your private key decrypts the AES key</li>
+            <li><strong>AES Decryption:</strong> AES key decrypts the PDF content</li>
+            <li><strong>Hash Verification:</strong> Document hash is verified against blockchain</li>
+            <li><strong>Green Tick:</strong> Visual confirmation of successful verification</li>
+            <li><strong>Download:</strong> Authenticated PDF is ready for use</li>
+        </ol>
+
+        <div class="security-badges">
+            <div class="badge">🔐 AES-256</div>
+            <div class="badge">🔑 RSA-4096</div>
+            <div class="badge">⛓️ Ethereum</div>
+            <div class="badge">⏰ Time-Lock</div>
+            <div class="badge">#️⃣ SHA-256</div>
+        </div>
+    </div>
+    </div>
+
     <script src="js/get.js"></script>
+    <script>
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+            document.getElementById(tab + 'Tab').classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+        }
+    </script>
 </body>
 
 </html>

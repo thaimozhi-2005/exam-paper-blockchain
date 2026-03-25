@@ -13,5 +13,29 @@
     "role": "principal",
     "name": "College Principal",
     "college_id": "COL001"
+  },
+  "PRIN002": {
+    "register_no": "PRIN002",
+    "email": "Ajay12345@gmail.com",
+    "password": "c9469a38b92c2a3f1278a5a6fbd3dad03a9df736906558940d5f1b490257f100",
+    "role": "principal",
+    "name": "Ajay",
+    "college_id": "COL002"
+  },
+  "PRIN003": {
+    "register_no": "PRIN003",
+    "email": "thaimozhi2005@gmail.com",
+    "password": "42eeb3928fa3ff093d418fa56cf1e74288a0f54c1342b501d55e86e84078d7a3",
+    "role": "principal",
+    "name": "Ajay",
+    "college_id": "COL003"
+  },
+  "prin004": {
+    "register_no": "prin004",
+    "email": "prin004@gmail.com",
+    "password": "ef797c8118f02dfb649607dd5d3f8c7623048c9c063d532cc95c5ed7a898a64f",
+    "role": "principal",
+    "name": "aaaa",
+    "college_id": "col123"
   }
 }

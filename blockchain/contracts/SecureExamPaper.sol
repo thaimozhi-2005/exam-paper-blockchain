@@ -45,6 +45,13 @@ contract SecureExamPaper {
         uint256 timestamp
     );
     
+    event PaperRescheduled(
+        uint256 indexed paperId,
+        uint256 oldDateTime,
+        uint256 newDateTime,
+        uint256 updateTimestamp
+    );
+    
     /**
      * @dev Store a new exam paper on the blockchain
      * @param _collegeId College identifier
@@ -158,6 +165,23 @@ contract SecureExamPaper {
         papers[_paperId].verified = true;
         
         emit PaperVerified(_paperId, msg.sender, block.timestamp);
+    }
+    
+    /**
+     * @dev Reschedule an exam by updating the examDateTime
+     * @param _paperId The ID of the paper to reschedule
+     * @param _newExamDateTime The new scheduled exam date/time
+     */
+    function rescheduleExam(uint256 _paperId, uint256 _newExamDateTime) public {
+        require(_paperId > 0 && _paperId <= paperCount, "Invalid paper ID");
+        require(msg.sender == papers[_paperId].owner, "Only the paper owner can reschedule");
+        require(!papers[_paperId].verified, "Cannot reschedule after paper is verified/opened");
+        require(_newExamDateTime > block.timestamp, "New exam date must be in the future");
+        
+        uint256 oldDateTime = papers[_paperId].examDateTime;
+        papers[_paperId].examDateTime = _newExamDateTime;
+        
+        emit PaperRescheduled(_paperId, oldDateTime, _newExamDateTime, block.timestamp);
     }
     
     /**
