@@ -36,8 +36,8 @@ class EmailService:
         
         # ===== CONFIGURATION =====
         self.demo_mode = False              # Set to False to send real emails
-        self.SENDER_EMAIL = "examcetre12@gmail.com"             # e.g. "yourname@gmail.com"
-        self.SENDER_PASSWORD = "rirf awuz fcwy eqpb"          # Gmail App Password (16 chars, NOT your regular password)
+        self.SENDER_EMAIL = "yourname@gmail.com"             # e.g. "yourname@gmail.com"
+        self.SENDER_PASSWORD = "raarf abbz fccy eddb"          # Gmail App Password (16 chars, NOT your regular password)
         # ==========================
     
     def _build_html_template(self, paper_id, subject_code, timestamp, college_id):
