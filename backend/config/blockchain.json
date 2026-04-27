@@ -1,8 +1,8 @@
 {
   "rpc_url": "http://127.0.0.1:8545",
-  "server_ip": "127.0.0.1",
+  "server_ip": "172.16.0.2",
   "chain_id": 1337,
-  "contract_address": "0xbA65D358kjhxksahlksalksaD51c771EAA6344b58",
-  "private_key": "0x2d6c9f1723ld82e091nqlkdj09que0912elk503e043f931c6c99bc10963b5d1",
+  "contract_address": "0xe80154C760e5a37F04f63351056C3bAbE3aC488C",
+  "private_key": "0x2d6c9f17239d7fda3945027179c0ff3f3b50b503e043f931c6c99bc10963b5d1",
   "abi_path": "../blockchain/build/contracts/SecureExamPaper.json"
 }
